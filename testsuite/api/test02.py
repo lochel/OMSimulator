@@ -28,9 +28,7 @@ def printStatus(status, expected):
   print("status:  [%s] %s" % (cmp, status), flush=True)
 
 def printType(t):
-  if oms.system_tlm == t:
-    print("type: system_tlm", flush=True)
-  elif oms.system_wc == t:
+  if oms.system_wc == t:
     print("type: system_wc", flush=True)
   elif oms.system_sc == t:
     print("type: system_sc", flush=True)
@@ -44,28 +42,25 @@ type, status = oms.getSystemType("test")
 printType(type)
 printStatus(status, 3)
 
-status = oms.addSystem("test.eoo", oms.system_tlm)
+status = oms.addSystem("test.foo", oms.system_wc)
 printStatus(status, 0)
 
-status = oms.addSystem("test.eoo.foo", oms.system_wc)
-printStatus(status, 0)
-
-status = oms.addSystem("test.eoo.foo.goo", oms.system_sc)
+status = oms.addSystem("test.foo.goo", oms.system_sc)
 printStatus(status, 0)
 
 type, status = oms.getSystemType("test")
 printType(type)
 printStatus(status, 3)
 
-type, status = oms.getSystemType("test.eoo")
+type, status = oms.getSystemType("test")
 printType(type)
 printStatus(status, 0)
 
-type, status = oms.getSystemType("test.eoo.foo")
+type, status = oms.getSystemType("test.foo")
 printType(type)
 printStatus(status, 0)
 
-type, status = oms.getSystemType("test.eoo.foo.goo")
+type, status = oms.getSystemType("test.foo.goo")
 printType(type)
 printStatus(status, 0)
 
@@ -79,10 +74,9 @@ printStatus(status, 0)
 ## status:  [correct] error
 ## status:  [correct] ok
 ## status:  [correct] ok
-## status:  [correct] ok
-## type: system_tlm
+## type: system_wc
 ## status:  [wrong] ok
-## type: system_tlm
+## type: system_wc
 ## status:  [correct] ok
 ## type: system_wc
 ## status:  [correct] ok

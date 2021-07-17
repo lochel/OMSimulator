@@ -31,20 +31,6 @@ QuarterCarModel.DisplacementDisplacement.Chassis \
 QuarterCarModel.DisplacementDisplacement.Wheel \
 QuarterCarModel.DisplacementForce.Chassis \
 QuarterCarModel.DisplacementForce.Wheel \
-tlm.adder \
-tlm.CoarseGrained1_1D \
-tlm.CoarseGrained2_1D \
-tlm.FineGrained1_1D \
-tlm.FineGrained2_1D \
-tlm.gain \
-tlm.LowerPendulum \
-tlm.LowerPendulumFG \
-tlm.mass \
-tlm.massSpring \
-tlm.source \
-tlm.UpperPendulum \
-tlm.UpperPendulumFG \
-tlm.UpperPendulumFG \
 
 SSPs = \
 embrace \
@@ -62,12 +48,10 @@ ASSCExample.mos \
 DualMassOscillator.mos \
 Enumeration.mos \
 HelloWorldWithInput.mos \
-Mass.mos \
 QuarterCarModel.mos \
 Blocks.mos \
 HelloWorld.mos \
 Lin2DimODE.mos \
-MassSpring.mos \
 
 .PHONY: all generateFMUs
 

@@ -1,8 +1,6 @@
 TEST = ../rtest -v
 
 TESTFILES = \
-buses.lua \
-buses.py \
 connections.lua \
 connections.py \
 test_omsExport.lua \

@@ -24,7 +24,6 @@ pipeline {
       }
       steps {
         submoduleNoChange("3rdParty")
-        submoduleNoChange("OMTLMSimulator")
       }
     }
     stage('build') {
@@ -126,9 +125,6 @@ pipeline {
               label 'linux'
             }
           }
-          environment {
-            OMSFLAGS = "OMTLM=OFF"
-          }
           steps {
             buildOMS()
           }
@@ -140,9 +136,6 @@ pipeline {
               dir '.CI/alpine'
               label 'linux'
             }
-          }
-          environment {
-            OMSFLAGS = "OMTLM=OFF"
           }
           steps {
             buildOMS()
@@ -362,7 +355,7 @@ make -C testsuite difftool resources
 cp -f "${env.RUNTESTDB}/"* testsuite/ || true
 find testsuite/ -name "*.lua" -exec sed -i /teardown_command/d {} ";"
 cd testsuite/partest
-./runtests.pl -j\$(nproc) -nocolour ${env.BRANCH_NAME == "master" ? "-notlm" : ""} -with-xml ${params.RUNTESTS_FLAG}
+./runtests.pl -j\$(nproc) -nocolour -with-xml ${params.RUNTESTS_FLAG}
 """
                 bat """
 set PATH=C:\\bin\\cmake\\bin;%PATH%
@@ -443,7 +436,7 @@ make -C testsuite difftool resources
 cp -f "${env.RUNTESTDB}/"* testsuite/ || true
 find testsuite/ -name "*.lua" -exec sed -i /teardown_command/d {} ";"
 cd testsuite/partest
-./runtests.pl -j\$(nproc) -nocolour ${env.BRANCH_NAME == "master" ? "-notlm" : ""} -with-xml ${params.RUNTESTS_FLAG}
+./runtests.pl -j\$(nproc) -nocolour -with-xml ${params.RUNTESTS_FLAG}
 """
                 bat """
 set PATH=C:\\bin\\cmake\\bin;%PATH%
@@ -550,7 +543,7 @@ make -C testsuite difftool resources
 cp -f "${env.RUNTESTDB}/"* testsuite/ || true
 find testsuite/ -name "*.lua" -exec sed -i /teardown_command/d {} ";"
 cd testsuite/partest
-./runtests.pl -j\$(nproc) -platform=win -nocolour ${env.BRANCH_NAME == "master" ? "-notlm" : ""} -with-xml ${params.RUNTESTS_FLAG}
+./runtests.pl -j\$(nproc) -platform=win -nocolour -with-xml ${params.RUNTESTS_FLAG}
 """
                 bat """
 set BOOST_ROOT=C:\\local\\boost_1_64_0
@@ -730,7 +723,7 @@ void partest(cache=true, extraArgs='') {
   ulimit -t 1500
 
   cd testsuite/partest
-  ./runtests.pl ${env.ASAN ? "-asan": ""} ${env.ASAN ? "-j1": "-j${numPhysicalCPU()}"} -nocolour ${env.BRANCH_NAME == "master" ? "-notlm" : ""} -with-xml ${params.RUNTESTS_FLAG} ${extraArgs}
+  ./runtests.pl ${env.ASAN ? "-asan": ""} ${env.ASAN ? "-j1": "-j${numPhysicalCPU()}"} -nocolour -with-xml ${params.RUNTESTS_FLAG} ${extraArgs}
   CODE=\$?
   test \$CODE = 0 -o \$CODE = 7 || exit 1
   """

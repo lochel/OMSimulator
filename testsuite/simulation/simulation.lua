@@ -33,10 +33,10 @@ printStatus(status, 0)
 status = oms_addSystem("simulation.co_sim", oms_system_wc)
 printStatus(status, 0)
 
-status = oms_addSubModel("simulation.co_sim.A", "../resources/tlm.source.fmu")
+status = oms_addSubModel("simulation.co_sim.A", "../resources/Modelica.Blocks.Sources.Sine.fmu")
 printStatus(status, 0)
 
-status = oms_addSubModel("simulation.co_sim.B", "../resources/tlm.source.fmu")
+status = oms_addSubModel("simulation.co_sim.B", "../resources/Modelica.Blocks.Sources.Sine.fmu")
 printStatus(status, 0)
 
 oms_exportDependencyGraphs("simulation.co_sim", "simulation_init.dot", "simulation_event.dot", "simulation_sim.dot")

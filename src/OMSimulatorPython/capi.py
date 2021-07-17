@@ -20,10 +20,6 @@ class capi:
     self.obj.oms_addConnector.restype = ctypes.c_int
     self.obj.oms_addConnectorToBus.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
     self.obj.oms_addConnectorToBus.restype = ctypes.c_int
-    self.obj.oms_addConnectorToTLMBus.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
-    self.obj.oms_addConnectorToTLMBus.restype = ctypes.c_int
-    self.obj.oms_addExternalModel.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
-    self.obj.oms_addExternalModel.restype = ctypes.c_int
     self.obj.oms_addResources.argtypes = [ctypes.c_char_p]
     self.obj.oms_addResources.restype = ctypes.c_int
     self.obj.oms_addSignalsToResults.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
@@ -32,10 +28,6 @@ class capi:
     self.obj.oms_addSubModel.restype = ctypes.c_int
     self.obj.oms_addSystem.argtypes = [ctypes.c_char_p, ctypes.c_int]
     self.obj.oms_addSystem.restype = ctypes.c_int
-    self.obj.oms_addTLMBus.argtypes = [ctypes.c_char_p, ctypes.c_int, ctypes.c_int, ctypes.c_int]
-    self.obj.oms_addTLMBus.restype = ctypes.c_int
-    self.obj.oms_addTLMConnection.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_double, ctypes.c_double, ctypes.c_double]
-    self.obj.oms_addTLMConnection.restype = ctypes.c_int
     self.obj.oms_compareSimulationResults.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_double, ctypes.c_double]
     self.obj.oms_compareSimulationResults.restype = ctypes.c_int
     self.obj.oms_copySystem.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
@@ -46,8 +38,6 @@ class capi:
     self.obj.oms_deleteConnection.restype = ctypes.c_int
     self.obj.oms_deleteConnectorFromBus.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
     self.obj.oms_deleteConnectorFromBus.restype = ctypes.c_int
-    self.obj.oms_deleteConnectorFromTLMBus.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
-    self.obj.oms_deleteConnectorFromTLMBus.restype = ctypes.c_int
     self.obj.oms_doStep.argtypes = [ctypes.c_char_p]
     self.obj.oms_doStep.restype = ctypes.c_int
     self.obj.oms_export.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
@@ -140,10 +130,6 @@ class capi:
     self.obj.oms_setStopTime.restype = ctypes.c_int
     self.obj.oms_setTempDirectory.argtypes = [ctypes.c_char_p]
     self.obj.oms_setTempDirectory.restype = ctypes.c_int
-    self.obj.oms_setTLMPositionAndOrientation.argtypes = [ctypes.c_char_p, ctypes.c_double, ctypes.c_double, ctypes.c_double, ctypes.c_double, ctypes.c_double, ctypes.c_double, ctypes.c_double, ctypes.c_double, ctypes.c_double, ctypes.c_double, ctypes.c_double, ctypes.c_double]
-    self.obj.oms_setTLMPositionAndOrientation.restype = ctypes.c_int
-    self.obj.oms_setTLMSocketData.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_int]
-    self.obj.oms_setTLMSocketData.restype = ctypes.c_int
     self.obj.oms_setTolerance.argtypes = [ctypes.c_char_p, ctypes.c_double, ctypes.c_double]
     self.obj.oms_setTolerance.restype = ctypes.c_int
     self.obj.oms_setVariableStepSize.argtypes = [ctypes.c_char_p, ctypes.c_double, ctypes.c_double, ctypes.c_double]
@@ -166,10 +152,6 @@ class capi:
     return self.obj.oms_addConnector(cref.encode(), causality, type_)
   def addConnectorToBus(self, busCref, connectorCref):
     return self.obj.oms_addConnectorToBus(busCref.encode(), connectorCref.encode())
-  def addConnectorToTLMBus(self, busCref, connectorCref, type_):
-    return self.obj.oms_addConnectorToTLMBus(busCref.encode(), connectorCref.encode(), type_.encode())
-  def addExternalModel(self, cref, path, startscript):
-    return self.obj.oms_addExternalModel(cref.encode(), path.encode(), startscript.encode())
   def addResources(self, crefA):
     return self.obj.oms_addResources(crefA.encode())
   def addSignalsToResults(self, cref, regex):
@@ -178,10 +160,6 @@ class capi:
     return self.obj.oms_addSubModel(cref.encode(), fmuPath.encode())
   def addSystem(self, ident, type_):
     return self.obj.oms_addSystem(ident.encode(), type_)
-  def addTLMBus(self, cref, domain, dimensions, interpolation):
-    return self.obj.oms_addTLMBus(cref.encode(), domain, dimensions, interpolation)
-  def addTLMConnection(self, crefA, crefB, delay, alpha, linearimpedance, angularimpedance):
-    return self.obj.oms_addTLMConnection(crefA.encode(), crefB.encode(), delay, alpha, linearimpedance, angularimpedance)
   def compareSimulationResults(self, filenameA, filenameB, var, relTol, absTol):
     return self.obj.oms_compareSimulationResults(filenameA.encode(), filenameB.encode(), var.encode(), relTol, absTol)
   def copySystem(self, source, target):
@@ -192,8 +170,6 @@ class capi:
     return self.obj.oms_deleteConnection(crefA.encode(), crefB.encode())
   def deleteConnectorFromBus(self, busCref, connectorCref):
     return self.obj.oms_deleteConnectorFromBus(busCref.encode(), connectorCref.encode())
-  def deleteConnectorFromTLMBus(self, busCref, connectorCref):
-    return self.obj.oms_deleteConnectorFromTLMBus(busCref.encode(), connectorCref.encode())
   def doStep(self, cref):
     return self.obj.oms_doStep(cref.encode())
   def export(self, cref, filename):
@@ -325,10 +301,6 @@ class capi:
     return self.obj.oms_setStopTime(cref.encode(), stopTime)
   def setTempDirectory(self, newTempDir):
     return self.obj.oms_setTempDirectory(newTempDir.encode())
-  def setTLMPositionAndOrientation(self, cref, x1, x2, x3, A11, A12, A13, A21, A22, A23, A31, A32, A33):
-    return self.obj.oms_setTLMPositionAndOrientation(cref.encode(), x1, x2, x3, A11, A12, A13, A21, A22, A23, A31, A32, A33)
-  def setTLMSocketData(self, cref, address, managerPort, monitorPort):
-    return self.obj.oms_setTLMSocketData(cref.encode(), address.encode(), managerPort, monitorPort)
   def setTolerance(self, cref, absoluteTolerance, relativeTolerance):
     return self.obj.oms_setTolerance(cref.encode(), absoluteTolerance, relativeTolerance)
   def setVariableStepSize(self, cref, initialStepSize, minimumStepSize, maximumStepSize):

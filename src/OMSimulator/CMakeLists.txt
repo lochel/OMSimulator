@@ -11,9 +11,6 @@ link_directories(
   ${CVODELibrary_LIBRARYDIR}
   ${KINSOLLibrary_LIBRARYDIR}
   ${Boost_LIBRARY_DIRS})
-IF (OMTLM)
-  link_directories(${OMTLMSIMULATORLIB_LIBRARYDIR})
-ENDIF ()
 
 add_executable(OMSimulator main.cpp)
 

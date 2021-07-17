@@ -20,14 +20,6 @@ ELSEIF (CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5
   ENDIF ()
 ENDIF ()
 
-IF (OMTLM)
-  set(OMTLM_SOURCES "TLM/")
-  set(TLM_STRING "")
-ELSE ()
-  set(OMTLM_SOURCES "DummyTLM/")
-  set(TLM_STRING "-notlm")
-ENDIF ()
-
 list(APPEND OMSIMULATORLIB_SOURCES AlgLoop.cpp)
 list(APPEND OMSIMULATORLIB_SOURCES BusConnector.cpp)
 list(APPEND OMSIMULATORLIB_SOURCES Clock.cpp)
@@ -43,7 +35,6 @@ list(APPEND OMSIMULATORLIB_SOURCES CSVReader.cpp)
 list(APPEND OMSIMULATORLIB_SOURCES CSVWriter.cpp)
 list(APPEND OMSIMULATORLIB_SOURCES DirectedGraph.cpp)
 list(APPEND OMSIMULATORLIB_SOURCES Element.cpp)
-list(APPEND OMSIMULATORLIB_SOURCES ExternalModelInfo.cpp)
 list(APPEND OMSIMULATORLIB_SOURCES Flags.cpp)
 list(APPEND OMSIMULATORLIB_SOURCES FMUInfo.cpp)
 list(APPEND OMSIMULATORLIB_SOURCES Logging.cpp)
@@ -72,36 +63,6 @@ list(APPEND OMSIMULATORLIB_SOURCES ssd/ElementGeometry.cpp)
 list(APPEND OMSIMULATORLIB_SOURCES ssd/SystemGeometry.cpp)
 list(APPEND OMSIMULATORLIB_SOURCES ssd/Tags.cpp)
 
-IF (OMTLM)
-  list(APPEND OMSIMULATORLIB_SOURCES ${OMTLM_SOURCES}/ExternalModel.cpp)
-  list(APPEND OMSIMULATORLIB_SOURCES ${OMTLM_SOURCES}/SystemTLM.cpp)
-  list(APPEND OMSIMULATORLIB_SOURCES ${OMTLM_SOURCES}/TLMBusConnector.cpp)
-
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/3rdParty/misc/src/Bstring.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/3rdParty/misc/src/coordTransform.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/3rdParty/misc/src/double3.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/3rdParty/misc/src/double33.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/3rdParty/misc/src/double33s.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/3rdParty/misc/src/dsyevc3.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/3rdParty/misc/src/dsyevq3.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/3rdParty/misc/src/dsyevv3.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/3rdParty/misc/src/dsytrd3.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/3rdParty/misc/src/ErrorLog.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/3rdParty/misc/src/tostr.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/common/Communication/TLMClientComm.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/common/Communication/TLMCommUtil.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/common/Interfaces/TLMInterface.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/common/Interfaces/TLMInterface1D.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/common/Interfaces/TLMInterface3D.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/common/Interfaces/TLMInterfaceSignal.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/common/Interfaces/TLMInterfaceSignalInput.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/common/Interfaces/TLMInterfaceSignalOutput.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/common/Logging/TLMErrorLog.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/common/Parameters/ComponentParameter.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/common/Plugin/PluginImplementer.cc)
-  list(APPEND OMSIMULATORLIB_SOURCES ../../OMTLMSimulator/common/Plugin/TLMPlugin.cc)
-ENDIF (OMTLM)
-
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Version.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/Version.cpp" @ONLY)
 list(APPEND OMSIMULATORLIB_SOURCES "${CMAKE_CURRENT_BINARY_DIR}/Version.cpp")
 
@@ -116,14 +77,7 @@ include_directories(
   ${FMILibrary_INCLUDEDIR}
   ${KINSOLLibrary_INCLUDEDIR}
   ${LUALibrary_INCLUDEDIR}
-  ${OMTLM_SOURCES}
   ${PUGIXML_INCLUDEDIR})
-IF (OMTLM)
-  include_directories(
-    ${OMTLMSIMULATORLIB_INCLUDEDIR}
-    ${OMTLMSIMULATOR_INCLUDEDIR}
-    ${OMTLMSIMULATOR_3RDPARTY_INCLUDEDIR})
-ENDIF (OMTLM)
 
 link_directories(
   ${MINIZIP_LIBRARYDIR}
@@ -132,9 +86,6 @@ link_directories(
   ${CVODELibrary_LIBRARYDIR}
   ${KINSOLLibrary_LIBRARYDIR}
   ${Boost_LIBRARY_DIRS})
-IF (OMTLM)
-  link_directories(${OMTLMSIMULATORLIB_LIBRARYDIR})
-ENDIF ()
 
 # Shared library version
 add_library(OMSimulatorLib SHARED ${OMSIMULATORLIB_SOURCES})
@@ -156,8 +107,8 @@ IF (WIN32 AND MSVC)
   add_definitions(-DBOOST_ALL_DYN_LINK)
 ENDIF ()
 
-target_link_libraries(OMSimulatorLib minizip fmilib sundials_kinsol sundials_cvode sundials_nvecserial ${LIB_ATOMIC} ${Boost_LIBRARIES} ${OMTLM_LINKFLAGS} ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT} ${CPP_FS_LIBS})
-target_link_libraries(OMSimulatorLib_static minizip fmilib sundials_kinsol sundials_cvode sundials_nvecserial lua ${CMAKE_DL_LIBS} ${LIB_ATOMIC} ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} ${OMTLM_LINKFLAGS} ${CPP_FS_LIBS})
+target_link_libraries(OMSimulatorLib minizip fmilib sundials_kinsol sundials_cvode sundials_nvecserial ${LIB_ATOMIC} ${Boost_LIBRARIES} ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT} ${CPP_FS_LIBS})
+target_link_libraries(OMSimulatorLib_static minizip fmilib sundials_kinsol sundials_cvode sundials_nvecserial lua ${CMAKE_DL_LIBS} ${LIB_ATOMIC} ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} ${CPP_FS_LIBS})
 
 IF (WIN32 AND MINGW)
   target_link_libraries(OMSimulatorLib shlwapi)

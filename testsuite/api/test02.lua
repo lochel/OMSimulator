@@ -28,9 +28,7 @@ function printStatus(status, expected)
 end
 
 function printType(t)
-  if oms_system_tlm == t then
-    print("type: oms_system_tlm")
-  elseif oms_system_wc == t then
+  if oms_system_wc == t then
     print("type: oms_system_wc")
   elseif oms_system_sc == t then
     print("type: oms_system_sc")
@@ -46,13 +44,10 @@ type, status = oms_getSystemType("test")
 printType(type)
 printStatus(status, 3)
 
-status = oms_addSystem("test.eoo", oms_system_tlm)
+status = oms_addSystem("test.foo", oms_system_wc)
 printStatus(status, 0)
 
-status = oms_addSystem("test.eoo.foo", oms_system_wc)
-printStatus(status, 0)
-
-status = oms_addSystem("test.eoo.foo.goo", oms_system_sc)
+status = oms_addSystem("test.foo.goo", oms_system_sc)
 printStatus(status, 0)
 
 type, status = oms_getSystemType("test")
@@ -63,11 +58,11 @@ type, status = oms_getSystemType("test.eoo")
 printType(type)
 printStatus(status, 0)
 
-type, status = oms_getSystemType("test.eoo.foo")
+type, status = oms_getSystemType("test.foo")
 printType(type)
 printStatus(status, 0)
 
-type, status = oms_getSystemType("test.eoo.foo.goo")
+type, status = oms_getSystemType("test.foo.goo")
 printType(type)
 printStatus(status, 0)
 
@@ -81,16 +76,16 @@ printStatus(status, 0)
 -- status:  [correct] error
 -- status:  [correct] ok
 -- status:  [correct] ok
--- status:  [correct] ok
--- type: oms_system_tlm
+-- type: oms_system_wc
 -- status:  [wrong] ok
--- type: oms_system_tlm
--- status:  [correct] ok
+-- error:   [oms_getSystemType] Model "test" does not contain system "eoo"
+-- Unknown type
+-- status:  [wrong] error
 -- type: oms_system_wc
 -- status:  [correct] ok
 -- type: oms_system_sc
 -- status:  [correct] ok
 -- status:  [correct] ok
 -- info:    0 warnings
--- info:    1 errors
+-- info:    2 errors
 -- endResult

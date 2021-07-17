@@ -37,7 +37,6 @@ $ENV{GC_MARKERS}="1";
 my $use_db = 1;
 my $save_db = 1;
 my $asan = 0;
-my $notlm = 0;
 my $nocolour = '';
 my $count_tests = 0;
 my $run_failing = 0;
@@ -84,7 +83,6 @@ for(@ARGV){
     print("  -nocolour     Don't use colours in output.\n");
     print("  -nodb         Don't store timing data.\n");
     print("  -nosavedb     Don't overwrite stored timing data.\n");
-    print("  -notlm        Skip all tlm tests.\n");
     print("  -platform     Force to use a specific platform, e.g. win or linux32.\n");
     print("  -with-txt     Output TXT log.\n");
     print("  -with-xml     Output XML log.\n");
@@ -117,9 +115,6 @@ for(@ARGV){
   }
   elsif(/^-nosavedb$/) {
     $save_db = 0;
-  }
-  elsif(/^-notlm$/) {
-    $notlm = 1;
   }
   elsif(/^-platform(.*)$/) {
     $platform = $_;
@@ -171,8 +166,6 @@ if($use_db) {
 sub read_makefile {
   my $dir = shift;
   my $header = shift;
-
-  return if($notlm == 1 and $dir =~ m"/tlm"); # Skip tlm if -notlm is given.
 
   open(my $in, "<", "$dir/Makefile") or die "Couldn't open $dir/Makefile: $!";
 

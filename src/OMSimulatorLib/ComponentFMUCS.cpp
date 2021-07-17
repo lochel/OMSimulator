@@ -37,7 +37,6 @@
 #include "OMSFileSystem.h"
 #include "ssd/Tags.h"
 #include "System.h"
-#include "SystemTLM.h"
 #include "SystemWC.h"
 
 #include <fmilib.h>
@@ -300,18 +299,6 @@ oms::Component* oms::ComponentFMUCS::NewComponent(const pugi::xml_node& node, om
 
 oms_status_enu_t oms::ComponentFMUCS::exportToSSD(pugi::xml_node& node, Snapshot& snapshot) const
 {
-#if !defined(NO_TLM)
-  if (tlmbusconnectors[0])
-  {
-    pugi::xml_node annotations_node = node.append_child(oms::ssp::Draft20180219::ssd::annotations);
-    pugi::xml_node annotation_node = annotations_node.append_child(oms::ssp::Version1_0::ssc::annotation);
-    annotation_node.append_attribute("type") = oms::ssp::Draft20180219::annotation_type;
-    for (const auto& tlmbusconnector : tlmbusconnectors)
-      if (tlmbusconnector)
-        tlmbusconnector->exportToSSD(annotation_node);
-  }
-#endif
-
   node.append_attribute("name") = this->getCref().c_str();
   node.append_attribute("type") = "application/x-fmu-sharedlibrary";
   node.append_attribute("source") = getPath().c_str();
@@ -757,12 +744,6 @@ oms_status_enu_t oms::ComponentFMUCS::stepUntil(double stopTime)
 
   while (time < stopTime)
   {
-#if !defined(NO_TLM)
-    //Read from TLM sockets if top level system is of TLM type
-    if(topLevelSystem->getType() == oms_system_tlm)
-      reinterpret_cast<SystemTLM*>(topLevelSystem)->readFromSockets(reinterpret_cast<SystemWC*>(getParentSystem()), time, this);
-#endif
-
     // HACK for certain FMUs
     if (fetchAllVars_)
     {
@@ -779,12 +760,6 @@ oms_status_enu_t oms::ComponentFMUCS::stepUntil(double stopTime)
 
     fmistatus = fmi2_import_do_step(fmu, time, hdef, fmi2_true);
     time += hdef;
-
-#if !defined(NO_TLM)
-    //Write to TLM sockets if top level system is of TLM type
-    if(topLevelSystem->getType() == oms_system_tlm)
-      reinterpret_cast<SystemTLM*>(topLevelSystem)->writeToSockets(reinterpret_cast<SystemWC*>(getParentSystem()), time, this);
-#endif
   }
   time = stopTime;
   return oms_status_ok;

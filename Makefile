@@ -7,10 +7,6 @@ CP=cp -rf
 MKDIR=mkdir -p
 ROOT_DIR=$(shell pwd)
 
-# Option to build LIBXML2 as part of the 3rdParty projects
-LIBXML2 ?= $(OMTLM)
-# Option to enable OMTLM
-OMTLM ?= ON
 # Option to enable AddressSanitizer
 ASAN ?= OFF
 # Statically link dependencies as much as possible
@@ -24,8 +20,6 @@ ifeq ($(detected_OS),Darwin)
 	BUILD_DIR := build/mac
 	INSTALL_DIR := install/mac
 	CMAKE_TARGET=-DCMAKE_SYSTEM_NAME=$(detected_OS)
-	LIBXML2 := OFF
-	OMTLM := OFF
 	export ABI := MAC64
 	FEXT=.dylib
 	CMAKE_FPIC=-DCMAKE_C_FLAGS="-fPIC"
@@ -34,7 +28,6 @@ else ifeq (MINGW32,$(findstring MINGW32,$(detected_OS)))
 	INSTALL_DIR := install/mingw
 	CMAKE_TARGET=-G "MSYS Makefiles"
 	FMIL_FLAGS?=-DFMILIB_FMI_PLATFORM=win32
-	LIBXML2 := OFF
 	export ABI := WINDOWS32
 	FEXT=.dll
 	EEXT=.exe
@@ -46,7 +39,6 @@ else ifeq (MINGW,$(findstring MINGW,$(detected_OS)))
 	INSTALL_DIR := install/mingw
 	CMAKE_TARGET=-G "MSYS Makefiles"
 	FMIL_FLAGS?=-DFMILIB_FMI_PLATFORM=win64
-	LIBXML2 := OFF
 	export ABI := WINDOWS64
 	FEXT=.dll
 	EEXT=.exe
@@ -101,8 +93,6 @@ ifeq ($(CROSS_TRIPLE),)
   CMAKE=cmake $(CMAKE_TARGET)
 else
   LUA_EXTRA_FLAGS=CC=$(CC) CXX=$(CXX) RANLIB=$(CROSS_TRIPLE)-ranlib detected_OS=$(detected_OS)
-  OMTLM := OFF
-  LIBXML2 := OFF
   CROSS_TRIPLE_DASH = $(CROSS_TRIPLE)-
   HOST_CROSS_TRIPLE = "--host=$(CROSS_TRIPLE)"
   FMIL_FLAGS ?=
@@ -123,15 +113,12 @@ else
 	CMAKE_BOOST_ROOT="-DBOOST_ROOT=$(BOOST_ROOT)"
 endif
 
-.PHONY: OMSimulator OMSimulatorCore config-OMSimulator config-fmil config-lua config-minizip config-cvode config-kinsol config-3rdParty distclean testsuite doc doc-html doc-doxygen OMTLMSimulator OMTLMSimulatorClean RegEx pip
+.PHONY: OMSimulator OMSimulatorCore config-OMSimulator config-fmil config-lua config-minizip config-cvode config-kinsol config-3rdParty distclean testsuite doc doc-html doc-doxygen RegEx pip
 
 OMSimulator:
 	@echo OS: $(detected_OS)
-	@echo TLM: $(OMTLM)
-	@echo LIBXML2: $(LIBXML2)
 	@echo "# make OMSimulator"
 	@echo
-	@$(MAKE) CC="$(CXX)" CXX="$(CXX)" OMTLMSimulator
 	@$(MAKE) OMSimulatorCore
 	test ! -z "$(DISABLE_RUN_OMSIMULATOR_VERSION)" || $(TOP_INSTALL_DIR)/bin/OMSimulator --version
 
@@ -153,39 +140,6 @@ pip:
 	@echo "# Run the following command to upload the package"
 	@echo "> twine upload src/pip/install/dist/$(shell ls src/pip/install/dist/ -Art | tail -n 1)"
 
-ifeq ($(OMTLM),ON)
-OMTLMSimulator: RegEx
-	@echo
-	@echo "# make OMTLMSimulator"
-	@echo
-	@echo $(ABI)
-	$(MAKE) -C OMTLMSimulator omtlmlib
-	test ! `uname` != Darwin || $(MAKE) -C OMTLMSimulator/FMIWrapper install
-	@$(MKDIR) $(TOP_INSTALL_DIR)/lib/$(HOST_SHORT_OMC)
-	@$(MKDIR) $(TOP_INSTALL_DIR)/bin
-	test ! "$(FEXT)" != ".dll" || cp OMTLMSimulator/bin/libomtlmsimulator$(FEXT) $(TOP_INSTALL_DIR)/lib/$(HOST_SHORT_OMC)
-	test ! "$(detected_OS)" = Darwin || ($(CROSS_TRIPLE_DASH)install_name_tool -id "@rpath/libomtlmsimulator$(FEXT)" $(TOP_INSTALL_DIR)/lib/$(HOST_SHORT_OMC)/libomtlmsimulator$(FEXT))
-	test ! "$(FEXT)" = ".dll" || cp OMTLMSimulator/bin/libomtlmsimulator$(FEXT) $(TOP_INSTALL_DIR)/bin/
-	test ! `uname` != Darwin || cp OMTLMSimulator/bin/FMIWrapper $(TOP_INSTALL_DIR)/bin/
-	test ! `uname` != Darwin || cp OMTLMSimulator/bin/StartTLMFmiWrapper $(TOP_INSTALL_DIR)/bin/
-
-OMTLMSimulatorStandalone: RegEx config-fmil
-	@echo
-	@echo "# make OMTLMSimulator Standalone"
-	@echo
-	@echo $(ABI)
-	@$(MAKE) -C OMTLMSimulator install
-else
-OMTLMSimulator:
-OMTLMSimulatorStandalone:
-endif
-
-OMTLMSimulatorClean:
-	@echo
-	@echo "# clean OMTLMSimulator"
-	@echo
-	@$(MAKE) -C OMTLMSimulator clean
-
 # build our RegEx executable that will tell us if we need to use std::regex or boost::regex
 RegEx: 3rdParty/RegEx/OMSRegEx$(EEXT)
 3rdParty/RegEx/OMSRegEx$(EEXT): 3rdParty/RegEx/RegEx.h 3rdParty/RegEx/OMSRegEx.cpp
@@ -195,7 +149,7 @@ RegEx: 3rdParty/RegEx/OMSRegEx$(EEXT)
 	@echo "Please checkout the 3rdParty submodule, e.g. using \"git submodule update --init 3rdParty\", and try again."
 	@false
 
-config-3rdParty: 3rdParty/README.md config-fmil config-lua config-minizip config-cvode config-kinsol config-libxml2
+config-3rdParty: 3rdParty/README.md config-fmil config-lua config-minizip config-cvode config-kinsol
 
 config-OMSimulator: $(BUILD_DIR)/Makefile
 $(BUILD_DIR)/Makefile: RegEx CMakeLists.txt
@@ -204,7 +158,7 @@ $(BUILD_DIR)/Makefile: RegEx CMakeLists.txt
 	@echo
 	$(eval STD_REGEX := $(shell 3rdParty/RegEx/OMSRegEx$(EEXT)))
 	$(MKDIR) $(BUILD_DIR)
-	cd $(BUILD_DIR) && $(CMAKE) $(CMAKE_TARGET) ../.. -DABI=$(ABI) -DSTD_REGEX=$(STD_REGEX) -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DOMTLM:BOOL=$(OMTLM) -DASAN:BOOL=$(ASAN) -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) $(CMAKE_BOOST_ROOT) $(CMAKE_INSTALL_PREFIX) $(HOST_SHORT) $(EXTRA_CMAKE) $(CMAKE_STATIC)
+	cd $(BUILD_DIR) && $(CMAKE) $(CMAKE_TARGET) ../.. -DABI=$(ABI) -DSTD_REGEX=$(STD_REGEX) -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DASAN:BOOL=$(ASAN) -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) $(CMAKE_BOOST_ROOT) $(CMAKE_INSTALL_PREFIX) $(HOST_SHORT) $(EXTRA_CMAKE) $(CMAKE_STATIC)
 
 config-fmil: 3rdParty/FMIL/$(INSTALL_DIR)/lib/libfmilib.a
 3rdParty/FMIL/$(INSTALL_DIR)/lib/libfmilib.a: 3rdParty/FMIL/$(BUILD_DIR)/Makefile
@@ -254,28 +208,10 @@ config-kinsol: 3rdParty/kinsol/$(INSTALL_DIR)/lib/libsundials_kinsol.a
 	$(MKDIR) 3rdParty/kinsol/$(BUILD_DIR)
 	cd 3rdParty/kinsol/$(BUILD_DIR) && $(CMAKE) $(CMAKE_TARGET) ../.. -DCMAKE_INSTALL_PREFIX=../../$(INSTALL_DIR) -DEXAMPLES_ENABLE:BOOL=0 -DBUILD_SHARED_LIBS:BOOL=0 $(CMAKE_FPIC)
 
-ifeq ($(LIBXML2),OFF)
-config-libxml2:
-	@echo
-	@echo "# LIBXML2=OFF => Skipping build of 3rdParty library libxml2 (must be installed on system instead)."
-	@echo
-else
-config-libxml2: 3rdParty/libxml2/$(INSTALL_DIR)/lib/libxml2.a
-3rdParty/libxml2/$(INSTALL_DIR)/lib/libxml2.a: 3rdParty/libxml2/Makefile
-	$(MAKE) -C 3rdParty/libxml2/ && $(MAKE) -C 3rdParty/libxml2/ install
-3rdParty/libxml2/Makefile:
-	@echo
-	@echo "# config libxml2"
-	@echo
-	$(MKDIR) 3rdParty/libxml2/$(INSTALL_DIR)
-	cd 3rdParty/libxml2 && $(FPIC) ./autogen.sh --prefix="$(ROOT_DIR)/3rdParty/libxml2/$(INSTALL_DIR)" $(DISABLE_SHARED) --without-python --without-zlib --without-lzma $(HOST_CROSS_TRIPLE)
-endif
-
 distclean:
 	@echo
 	@echo "# make distclean"
 	@echo
-	@$(MAKE) OMTLMSimulatorClean
 	$(RM) $(BUILD_DIR)
 	$(RM) $(INSTALL_DIR)
 	$(RM) 3rdParty/FMIL/$(BUILD_DIR)

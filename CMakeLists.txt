@@ -171,35 +171,6 @@ ELSE()
 ENDIF()
 
 ##########################
-# Configuration for OMTLMSimulatorLib
-option(OMTLM "Enable the OMTLMSimulator module." ON)
-IF(OMTLM)
-set(OMTLMSIMULATOR_INCLUDEDIR ${PROJECT_SOURCE_DIR}/OMTLMSimulator/common)
-set(OMTLMSIMULATORLIB_INCLUDEDIR ${PROJECT_SOURCE_DIR}/OMTLMSimulator/common/OMTLMSimulatorLib)
-IF(WIN32)
-  set(OMTLMSIMULATORLIB_LIBRARYDIR ${PROJECT_SOURCE_DIR}/OMTLMSimulator/bin)
-ELSE() # use it from the install folder where is properly installed for MacOS
-  set(OMTLMSIMULATORLIB_LIBRARYDIR ${CMAKE_INSTALL_PREFIX}/lib/${HOST_SHORT})
-ENDIF()
-set(OMTLMSIMULATOR_3RDPARTY_INCLUDEDIR ${PROJECT_SOURCE_DIR}/OMTLMSimulator/3rdParty/misc/include)
-IF(WIN32)
-  IF (MINGW)
-    # adrpo: link with the full path to the dll on MINGW
-    set(OMTLM_LINKFLAGS ${OMTLMSIMULATORLIB_LIBRARYDIR}/libomtlmsimulator.dll wsock32 ws2_32)
-    message(STATUS "OMTLMSimulator enabled: ${OMTLM_LINKFLAGS}")
-  ELSE(MINGW)
-    set(OMTLM_LINKFLAGS omtlmsimulator wsock32 ws2_32)
-  ENDIF(MINGW)
-ELSE(WIN32)
-  set(OMTLM_LINKFLAGS omtlmsimulator)
-ENDIF(WIN32)
-  message(STATUS "OMTLMSimulator enabled.")
-ELSE(OMTLM)
-  set(OMTLM_LINKFLAGS)
-  message(STATUS "OMTLMSimulator disabled.")
-ENDIF(OMTLM)
-
-##########################
 # Add project modules
 add_subdirectory(src/OMSimulator)
 add_subdirectory(src/OMSimulatorLib)

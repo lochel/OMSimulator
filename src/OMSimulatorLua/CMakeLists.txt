@@ -12,8 +12,7 @@ link_directories(
   ${FMILibrary_LIBRARYDIR}
   ${LUALibrary_LIBRARYDIR}
   ${CVODELibrary_LIBRARYDIR}
-  ${KINSOLLibrary_LIBRARYDIR}
-  ${OMTLMSIMULATORLIB_LIBRARYDIR})
+  ${KINSOLLibrary_LIBRARYDIR})
 
 # Shared library version
 add_library(OMSimulatorLua STATIC OMSimulatorLua.c)

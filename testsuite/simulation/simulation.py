@@ -33,10 +33,10 @@ printStatus(status, 0)
 status = oms.addSystem("test.co_sim", oms.system_wc)
 printStatus(status, 0)
 
-status = oms.addSubModel("test.co_sim.A", "../resources/tlm.source.fmu")
+status = oms.addSubModel("test.co_sim.A", "../resources/Modelica.Blocks.Sources.Sine.fmu")
 printStatus(status, 0)
 
-status = oms.addSubModel("test.co_sim.B", "../resources/tlm.source.fmu")
+status = oms.addSubModel("test.co_sim.B", "../resources/Modelica.Blocks.Sources.Sine.fmu")
 printStatus(status, 0)
 
 oms.exportDependencyGraphs("test.co_sim", "test_init1.dot", "test_event1.dot", "test_sim1.dot")
