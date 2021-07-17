@@ -105,7 +105,6 @@ else
   ifeq ($(detected_OS),Darwin)
     EXTRA_CMAKE+=-DCMAKE_INSTALL_NAME_TOOL=$(CROSS_TRIPLE)-install_name_tool
   endif
-  DISABLE_RUN_OMSIMULATOR_VERSION ?= 1
 endif
 
 ifeq ($(BOOST_ROOT),)
@@ -120,7 +119,7 @@ OMSimulator:
 	@echo "# make OMSimulator"
 	@echo
 	@$(MAKE) OMSimulatorCore
-	test ! -z "$(DISABLE_RUN_OMSIMULATOR_VERSION)" || $(TOP_INSTALL_DIR)/bin/OMSimulator --version
+	$(TOP_INSTALL_DIR)/bin/OMSimulatorPython3 $(TOP_INSTALL_DIR)/bin/oms3.py --version
 
 OMSimulatorCore:
 	@echo
