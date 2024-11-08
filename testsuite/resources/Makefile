@@ -77,6 +77,7 @@ Blocks.mos \
 DualMassOscillator.mos \
 Enumeration.mos \
 equationPair.mos \
+EventTest.mos \
 fmidertest.mos \
 HelloWorld.mos \
 HelloWorldWithInput.mos \
